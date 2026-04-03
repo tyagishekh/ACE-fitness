@@ -27,7 +27,7 @@ pipeline {
 
         stage('Unit Tests') {
             steps {
-                sh '. .venv/bin/activate && pytest -q'
+                sh '. .venv/bin/activate && python -m pytest -q'
             }
         }
     }
