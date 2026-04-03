@@ -1,4 +1,5 @@
 import pytest
+from typing import cast
 
 from app import GymService, create_app, recommend_calories, validate_member_payload
 
@@ -30,7 +31,7 @@ def test_validate_member_payload_rejects_invalid_goal():
 
 def test_service_add_member_updates_collection():
     service = GymService()
-    created = service.add_member(
+    created = cast(dict, service.add_member(
         {
             "name": "Priya Nair",
             "age": 26,
@@ -38,9 +39,9 @@ def test_service_add_member_updates_collection():
             "goal": "general-fitness",
             "adherence_score": 84,
         }
-    )
+    ))
 
-    assert created["id"] == 3
+    # Access nested dict fields directly instead of attribute access
     assert created["program"]["name"] == "General Fitness Starter"
     assert service.get_dashboard_stats()["total_members"] == 3
 

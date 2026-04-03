@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from statistics import mean
-from typing import Dict, List
+from typing import Any, Dict, List, cast, Union
 
 from flask import Flask, jsonify, request
 
 
-PROGRAM_CATALOG: Dict[str, Dict[str, object]] = {
+PROGRAM_CATALOG: Dict[str, Dict[str, Union[str, int]]] = {
     "fat-loss": {
         "name": "Fat Loss Foundation",
         "days_per_week": 4,
@@ -66,9 +66,9 @@ def validate_member_payload(payload: Dict[str, object]) -> Dict[str, object]:
         raise ValueError("Name cannot be empty")
 
     try:
-        age = int(payload["age"])
-        adherence_score = int(payload["adherence_score"])
-        weight_kg = float(payload["weight_kg"])
+        age = int(cast(Any, payload["age"]))
+        adherence_score = int(cast(Any, payload["adherence_score"]))
+        weight_kg = float(cast(Any, payload["weight_kg"]))
     except (TypeError, ValueError) as exc:
         raise ValueError("Age, weight_kg, and adherence_score must be numeric") from exc
 
@@ -126,9 +126,27 @@ class GymService:
 
     def add_member(self, payload: Dict[str, object]) -> Dict[str, object]:
         data = validate_member_payload(payload)
-        member = Member(id=self._next_id, **data)
+        # Generate a unique ID by finding the max existing ID and adding 1
+        next_id = max((member.id for member in self._members), default=0) + 1
+
+        member_name = cast(str, data["name"])
+        member_age = cast(int, data["age"])
+        member_weight = cast(float, data["weight_kg"])
+        member_goal = cast(str, data["goal"])
+        member_adherence = cast(int, data["adherence_score"])
+        member_status = cast(str, data["membership_status"])
+
+        member = Member(
+            id=next_id,
+            name=member_name,
+            age=member_age,
+            weight_kg=member_weight,
+            goal=member_goal,
+            adherence_score=member_adherence,
+            membership_status=member_status,
+        )
         self._members.append(member)
-        self._next_id += 1
+        self._next_id = next_id + 1
         return member.to_dict()
 
     def get_member(self, member_id: int) -> Dict[str, object]:
