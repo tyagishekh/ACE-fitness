@@ -29,7 +29,7 @@ jobs:
         run: docker build -t aceest-fitness-app:ci .
 
       - name: Run pytest locally
-        run: pytest -q
+        run: pytest -m pytest tests/test_app.py -q
 
       - name: Run pytest inside Docker image
-        run: docker run --rm aceest-fitness-app:ci pytest -q
+        run: docker run --rm aceest-fitness-app:ci python -m pytest tests/test_app.py -q

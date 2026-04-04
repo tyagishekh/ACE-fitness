@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
 COPY app.py ./app.py
+COPY pytest.ini ./pytest.ini
 COPY tests ./tests
 
 USER appuser
